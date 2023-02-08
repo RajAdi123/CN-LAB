@@ -1,0 +1,54 @@
+import java.net.*;
+import java.util.Scanner;
+
+public class UDPS {
+    public static void main(String args[]) {
+        DatagramSocket skt = null;
+        Scanner sc = new Scanner(System.in);
+        try {
+            skt = new DatagramSocket(6788);
+            System.out.println("Server is started");
+            byte[] buffer = new byte[1024];
+            while (true) {
+                DatagramPacket request = new DatagramPacket(buffer, buffer.length);
+                skt.receive(request);
+                System.out.println("ENter the Message ");
+                String msg = sc.nextLine();
+                byte[] sendMsg = (msg.toUpperCase() + " from Server to Client ").getBytes();
+                DatagramPacket reply = new DatagramPacket(sendMsg, sendMsg.length, request.getAddress(),
+                        request.getPort());
+                skt.send(reply);
+                skt.close();
+                sc.close();
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+}
+
+
+
+
+import java.net.*;
+
+public class UDPC {
+    public static void main(String args[]) {
+        DatagramSocket skt;
+        try {
+            skt = new DatagramSocket();
+            byte[] b = new byte[4096];
+            InetAddress host = InetAddress.getByName("127.0.0.1");
+            int serverSocket = 6788;
+            DatagramPacket request = new DatagramPacket(b, b.length, host, serverSocket);
+            skt.send(request);
+            byte[] buffer = new byte[4096];
+            DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
+            skt.receive(reply);
+            System.out.println("Client Recieved From Server :" + new String(reply.getData()));
+            skt.close();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+}
