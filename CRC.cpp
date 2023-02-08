@@ -1,16 +1,18 @@
 #include <iostream>
 #include <string.h>
+
 using namespace std;
 
-int crc(char *ip, char *op, char *poly, int mode)
+int crc(char *ip, char *op, char *poly, int mode,int len)
 {
     strcpy(op, ip);
+    int k=0;
     if (mode)
     {
         for (int i = 1; i < strlen(poly); i++)
             strcat(op, "0");
     }
-    // Perfrom XOR on the message with the selected polynomial
+    /* Perform XOR on the msg with the selected polynomial */
     for (int i = 0; i < strlen(ip); i++)
     {
         if (op[i] == '1')
@@ -24,29 +26,33 @@ int crc(char *ip, char *op, char *poly, int mode)
             }
         }
     }
-    // Check for errors. Return 0 if error detected
+    /* check for errors. return 0 if error detected */
     for (int i = 0; i < strlen(op); i++)
         if (op[i] == '1')
-            return 0;
-    return 1;
+           k++;
+          
+    if(strlen(op)==len && k==0)
+        return 1;
+    
+    return 0;
 }
 
 int main()
 {
     char ip[50], op[50], recv[50];
-    char poly[] = "10001000000100001";
+    char poly[] = "10011";
 
-    cout << "Enter the input message in  binary" << endl;
+    cout << "Enter the input message in binary" << endl;
     cin >> ip;
-    crc(ip, op, poly, 1);
-    cout << "The transmitted message is:" << ip << op + strlen(ip) << endl;
-    cout << "Enter the received message in binary" << endl;
+    crc(ip, op, poly, 1,strlen(ip));
+    cout << "The transmitted message is: " << ip << op + strlen(ip) << endl;
+    strcat(ip,op+strlen(ip));
+    cout << "Enter the recevied message in binary" << endl;
     cin >> recv;
-
-    if (crc(recv, op, poly, 0))
+    if (crc(recv, op, poly, 0,strlen(ip)))
         cout << "No error in data" << endl;
     else
-        cout << "Error in data transmission has occured" << endl;
+        cout << "Error in data transmission has occurred" << endl;
 
     return 0;
 }
